@@ -1,0 +1,43 @@
+---
+- name: basic setup
+  yum:
+    pkg: "{{item}}"
+    state: present
+    update_cache: yes
+  with_items:
+    - epel-release
+    - pygpgme
+    - curl
+
+- name: get nodejs repo
+  get_url:
+    url: https://rpm.nodesource.com/setup_5.x
+    dest: ~/setup-nodejs
+  # shell: curl --fail -sSL -o setup-nodejs https://rpm.nodesource.com/setup
+
+- name: setup nodejs
+  shell: bash setup-nodejs chdir=~
+
+- name: install nodejs and dependencies
+  yum:
+    pkg: "{{item}}"
+    state: present
+    update_cache: yes
+  with_items:
+    - nodejs
+    - gcc-c++
+    - make
+
+- name: add passenger repository
+  get_url:
+    url: https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo
+    dest: /etc/yum.repos.d/
+
+- name: install nginx and passenger
+  yum:
+    pkg: "{{item}}"
+    state: present
+    update_cache: yes
+  with_items:
+    - nginx
+    - passenger
